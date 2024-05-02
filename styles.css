@@ -2,19 +2,26 @@ body {
     font-family: Arial, sans-serif;
 }
 
-.header {
+.history-header {
     background-color: #7ABA78;
     color: white;
     padding: 10px;
     text-align: center;
 }
 
-.birth-list {
+.jokes-header {
+    background-color: #E1ACAC;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.data-list {
     margin-top: 20px;
     padding: 10px;
 }
 
-.birth-item {
+.data-item {
     margin-bottom: 15px;
 }
 .footer {

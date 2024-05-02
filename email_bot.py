@@ -72,11 +72,12 @@ def get_data_from_api_providers(api_provider):
         )
 
 
-def update_history_newsletter(data):
-    html_file_path = "data/history_newsletter.html"
+def update_newsletter_with_api_data(data, provider):
+    html_file_path = f"data/{provider}_newsletter_template.html"
     base = os.path.dirname(os.path.abspath(__file__))
     html = open(os.path.join(base, html_file_path))
     soup = bs(html, "lxml")
+    print(soup.get_text()) #delete
 
     new_texts = data.splitlines()
 
@@ -86,15 +87,10 @@ def update_history_newsletter(data):
         raise ValueError("There are more texts to update than available <h2> tags")
 
     for index in range(len(new_texts)):
-        old_h2_tags[index].string = f"🎉 {new_texts[index]}"
-
-    with open(html_file_path, "w", encoding="utf-8") as file:
-        file.write(str(soup))
-
-
-def format_data_into_a_message(data, provider):
-    if provider == "wikimedia":
-        update_history_newsletter(data)
+        old_h2_tags[index].string += new_texts[index]
+    
+    print(soup.prettify())
+    return soup
 
 
 def main():
@@ -107,7 +103,7 @@ def main():
     data, provider = get_data_from_api_providers(api_provider)
     print("Api data: ", data)
     print("Api provider: ", provider)
-    format_data_into_a_message(data, provider)
+    newswttler_message = update_newsletter_with_api_data(data, provider)
 
 
 if __name__ == "__main__":
