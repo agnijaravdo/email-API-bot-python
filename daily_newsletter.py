@@ -1,7 +1,6 @@
 import sys
 import os
 from email_validator import validate_email, EmailNotValidError
-from dotenv import load_dotenv
 from bs4 import BeautifulSoup as bs
 from api_handler import get_jokes_response, get_wikimedia_response
 from email_handler import send_an_email
