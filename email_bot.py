@@ -2,6 +2,8 @@ import sys
 import os
 import datetime
 import requests
+import smtplib
+from email.message import EmailMessage
 from email_validator import validate_email, EmailNotValidError
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup as bs
@@ -9,6 +11,7 @@ from bs4 import BeautifulSoup as bs
 email = sys.argv[1]
 api_provider = sys.argv[2]
 possible_api_providers = ["wikimedia", "jokes"]
+load_dotenv()
 
 
 def validate_email_address(email):
@@ -23,7 +26,6 @@ def get_wikimedia_response():
     date = today.strftime("%m/%d")
     url = "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/births/" + date
 
-    load_dotenv()
     WIKIMEDIA_ACCESS_TOKEN = os.getenv("WIKIMEDIA_ACCESS_TOKEN")
     USER_EMAIL = os.getenv("USER_EMAIL")
 
@@ -54,7 +56,7 @@ def get_jokes_response():
     headers = {"Accept": "text/plain"}
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        return response.text
+        return response.content.decode('utf-8')
     else:
         return "Failed to fetch data:", response.status_code
 
@@ -77,7 +79,6 @@ def update_newsletter_with_api_data(data, provider):
     base = os.path.dirname(os.path.abspath(__file__))
     html = open(os.path.join(base, html_file_path))
     soup = bs(html, "lxml")
-    print(soup.get_text()) #delete
 
     new_texts = data.splitlines()
 
@@ -89,8 +90,27 @@ def update_newsletter_with_api_data(data, provider):
     for index in range(len(new_texts)):
         old_h2_tags[index].string += new_texts[index]
     
-    print(soup.prettify())
-    return soup
+    return str(soup)
+
+
+def send_an_email(newsletter_message):
+    APP_PASSWORD = os.getenv("APP_PASSWORD")
+    msg = EmailMessage()
+    msg['Subject'] = 'Your daily newsletter!'
+    msg['From'] = email
+    msg['To'] = email
+
+    msg.set_content(newsletter_message, subtype='html')
+    
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.starttls()
+
+    try:
+        s.login(email, APP_PASSWORD)
+    except smtplib.SMTPAuthenticationError as e:
+        sys.exit(f"Email Authentication is not possible. Error: {e}")
+    s.send_message(msg)
+    print("Email sent successfully!")
 
 
 def main():
@@ -103,8 +123,8 @@ def main():
     data, provider = get_data_from_api_providers(api_provider)
     print("Api data: ", data)
     print("Api provider: ", provider)
-    newswttler_message = update_newsletter_with_api_data(data, provider)
-
+    newsletter_message = update_newsletter_with_api_data(data, provider)
+    send_an_email(newsletter_message)
 
 if __name__ == "__main__":
     main()
