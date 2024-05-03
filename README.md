@@ -41,6 +41,8 @@ Gmail API Newsletter Generator - a Python application designed to automate the c
 
 ## Visuals for newsletter content:
 - Historical events from Wikimedia API:
+
     <img src="./assets/event_of_the_day.png" width="500" alt="Main form">
 - Random dad joke from icanhazdadjoke API:
+
     <img src="./assets/joke_of_the_day.png" width="500" alt="Main form">
