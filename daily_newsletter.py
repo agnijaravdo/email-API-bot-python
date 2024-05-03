@@ -62,5 +62,14 @@ def main():
     response = send_an_email(email, newsletter_message)
     print(response)
 
+
 if __name__ == "__main__":
     main()
+
+
+# 5 Keybinds:
+# - cmd + shift + f = to search across all the files in the project
+# - cmd + p = search files by name in project
+# - Option + cmd + up/down arrow = to select multiple lines and edit them altogether (add cursor above/below)
+# - cmd + Shift + p = Search for a commands (open command pallete)
+# - cmd + d = duplicate the line/selection
