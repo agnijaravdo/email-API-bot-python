@@ -32,18 +32,16 @@ def get_response(url, headers):
 def get_wikimedia_response():
     today = datetime.datetime.now()
     date = today.strftime("%m/%d")
-    url = "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/births/" + date
-
-    WIKIMEDIA_ACCESS_TOKEN = os.getenv("WIKIMEDIA_ACCESS_TOKEN")
-    USER_EMAIL = os.getenv("USER_EMAIL")
+    url = f"https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/births/{date}"
 
     headers = {
-        "Authorization": f"Bearer {WIKIMEDIA_ACCESS_TOKEN}",
-        "User-Agent": USER_EMAIL,
+        "Authorization": f"Bearer {os.getenv("WIKIMEDIA_ACCESS_TOKEN")}",
+        "User-Agent": os.getenv("USER_EMAIL"),
     }
-    response = get_response(url, headers=headers)
 
+    response = get_response(url, headers=headers)
     data = response.json()
+
     if "births" in data and len(data["births"]) > 2:
         events = []
         for i in range(min(3, len(data["births"]))):
@@ -57,10 +55,9 @@ def get_wikimedia_response():
 
 def get_jokes_response():
     url = "https://icanhazdadjoke.com/"
-
     headers = {"Accept": "text/plain"}
-    response = get_response(url, headers=headers)
 
+    response = get_response(url, headers=headers)
     return response.content.decode("utf-8")
 
 
@@ -83,21 +80,20 @@ def update_newsletter_with_api_data(data, provider):
     with open(os.path.join(base, html_file_path)) as html:
         soup = bs(html, "lxml")
 
-    new_texts = data.splitlines()
+    new_h2_tags_texts = data.splitlines()
 
     old_h2_tags = soup.find_all("h2")
 
-    if len(old_h2_tags) < len(new_texts):
+    if len(old_h2_tags) < len(new_h2_tags_texts):
         raise ValueError("There are more texts to update than available <h2> tags")
 
-    for index in range(len(new_texts)):
-        old_h2_tags[index].string += new_texts[index]
+    for index in range(len(new_h2_tags_texts)):
+        old_h2_tags[index].string += new_h2_tags_texts[index]
 
     return str(soup)
 
 
 def send_an_email(newsletter_message):
-    APP_PASSWORD = os.getenv("APP_PASSWORD")
     email = sys.argv[1]
 
     msg = EmailMessage()
@@ -109,7 +105,7 @@ def send_an_email(newsletter_message):
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as s:
             s.starttls()
-            s.login(email, APP_PASSWORD)
+            s.login(email, os.getenv("APP_PASSWORD"))
             s.send_message(msg)
             print("Email sent successfully!")
     except smtplib.SMTPAuthenticationError as e:
@@ -118,9 +114,6 @@ def send_an_email(newsletter_message):
         print(f"An SMTP error occurred: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
-
-    s = smtplib.SMTP("smtp.gmail.com", 587)
-    s.starttls()
 
 
 def main():
@@ -131,8 +124,6 @@ def main():
 
     validate_email_address(email=sys.argv[1])
     data, provider = get_data_from_api_providers(api_provider=sys.argv[2])
-    print("Api data: ", data)
-    print("Api provider: ", provider)
 
     newsletter_message = update_newsletter_with_api_data(data, provider)
     send_an_email(newsletter_message)
