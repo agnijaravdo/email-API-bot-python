@@ -59,8 +59,8 @@ def main():
     data, provider = get_data_from_api_providers(api_provider)
 
     newsletter_message = update_newsletter_with_api_data(data, provider)
-    send_an_email(email, newsletter_message)
-
+    response = send_an_email(email, newsletter_message)
+    print(response)
 
 if __name__ == "__main__":
     main()

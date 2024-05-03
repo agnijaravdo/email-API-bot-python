@@ -20,10 +20,10 @@ def send_an_email(email, newsletter_message):
             s.starttls()
             s.login(email, os.getenv("APP_PASSWORD"))
             s.send_message(msg)
-            print("Email sent successfully!")
+            return "Email sent successfully!"
     except smtplib.SMTPAuthenticationError as e:
-        print(f"Email Authentication failed: {e}")
+        return f"Email Authentication failed: {e}"
     except smtplib.SMTPException as e:
-        print(f"An SMTP error occurred: {e}")
+        return f"An SMTP error occurred: {e}"
     except Exception as e:
-        print(f"An error occurred: {e}")
+        return f"An error occurred: {e}"
