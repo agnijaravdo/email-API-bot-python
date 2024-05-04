@@ -31,7 +31,7 @@ Gmail API Newsletter Generator - a Python application designed to automate the c
 
     Ensure you provide a valid email and choose between the two API options (`wikimedia` or `jokes`). Execute the command:
 
-    ```python3 daily-newsletter.py your-email@example.com api_choice```
+    ```python3 daily_newsletter.py your-email@example.com api_choice```
 
 4. If evething is okay, you will receive an email with the newsletter content.
 
